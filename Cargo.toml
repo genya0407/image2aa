@@ -7,3 +7,4 @@ authors = ["Yusuke Sangenya <longinus.eva@gmail.com>"]
 ndarray = { version = "0.10.0" }
 image = "*"
 string-error = "0.1.0"
+getopts = "0.2"
