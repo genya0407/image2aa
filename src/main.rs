@@ -51,9 +51,10 @@ fn write_grayscale_png(filename: String, img: &Array2<f32>) -> Result<(), Box<Er
 fn setup_option_parser() -> Options {
     let mut opts = Options::new();
     opts.optopt("s", "blocksize", "set bocksize (default: 32)", "SIZE");
-    opts.reqopt("i", "input", "input file path", "FILE");
+    opts.optopt("i", "input", "input file path", "FILE");
     opts.optopt("", "char-detect-thresh", "threshould for character detection (default: 10)", "THRESH");
     opts.optopt("", "line-detect-thresh", "threshould for line detection (default: 10)", "THRESH");
+    opts.optflag("", "help", "");
     return opts;
 }
 
@@ -64,6 +65,11 @@ fn main() {
         Ok(m) => m,
         Err(f) => panic!(f.to_string())
     };
+
+    if matches.opt_present("help") {
+        println!("{}", parser.short_usage("png2aa"));
+        return;
+    }
 
     let input_file = matches.opt_str("i").unwrap();
 
