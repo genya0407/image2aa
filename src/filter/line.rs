@@ -1,8 +1,4 @@
-#[macro_use(s)]
-
 use ndarray::*;
-
-const LINE_COLOR_VALUE: f32 = 250.;
 
 pub fn default() -> GradientFilter {
     let horizontal_edge_filter = Array1::<f32>::from(
@@ -57,75 +53,4 @@ pub fn convolve2d(base_arr: &Array2<f32>, filter: &Array2<f32>) -> Array2<f32> {
         }
     }
     return result;
-}
-
-fn assert_filter(filter: Array2<f32>, expected: Array2<f32>) {
-    let base = Array1::<f32>::from(
-        vec![
-            0.,0.,0.,0.,0.,
-            1.,1.,1.,1.,1.,
-            5.,5.,5.,5.,5.,
-            1.,1.,1.,1.,1.,
-            0.,0.,0.,0.,0.
-        ]
-    ).into_shape((5,5)).unwrap();
-    let convolved = convolve2d(&base, &filter);
-    assert_eq!(convolved, expected);    
-}
-
-#[test]
-fn test_convolve2d() {
-    let filter = Array1::<f32>::from(
-        vec![
-            -1. , -2., -1.,
-            0. , 0., 0.,
-            1.,2.,1.
-        ]
-    ).into_shape((3,3)).unwrap();
-    let expected = Array1::<f32>::from(
-        vec![
-            20.,20.,20.,
-            0.,0.,0.,
-            -20.,-20.,-20.
-        ]
-    ).into_shape((3,3)).unwrap();
-    assert_filter(filter, expected);
-
-    /*
-    let filter = Array1::<f32>::from(
-        vec![
-            1. , 2., 1.,
-            0. , 0., 0.,
-            -1.,-2.,-1.
-        ]
-    ).into_shape((3,3)).unwrap();
-    let expected = Array1::<f32>::from(
-        vec![
-            0.,0.,0.,0.,0.,
-            0.,-20.,-20.,-20.,0.,
-            0.,0.,0.,0.,0.,
-            0.,20.,20.,20.,0.,
-            0.,0.,0.,0.,0.
-        ]
-    ).into_shape((5,5)).unwrap();
-    assert_filter(filter, expected);
-
-    let filter = Array1::<f32>::from(
-        vec![
-            -1. , 0., 1.,
-            -2. , 0., 2.,
-            -1. , 0., 1.
-        ]
-    ).into_shape((3,3)).unwrap();
-    let expected = Array1::<f32>::from(
-        vec![
-            0.,0.,0.,0.,0.,
-            0.,0.,0.,0.,0.,
-            0.,0.,0.,0.,0.,
-            0.,0.,0.,0.,0.,
-            0.,0.,0.,0.,0.
-        ]
-    ).into_shape((5,5)).unwrap();
-    assert_filter(filter, expected);
-    */
 }

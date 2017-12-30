@@ -49,73 +49,8 @@ fn main() {
     let gradient_array = filter::line::default().run(grayscale_array.clone());
     let line_array = filter::binary::default().run(gradient_array);
     write_grayscale_png(String::from("out/line.png"), &line_array).unwrap();
+    let hough_filter = filter::block_hough::default();
+    let hough_array = hough_filter.run(line_array);
+    let aa = filter::ascii_art::default().run(hough_array);
+    println!("{}", aa);
 }
-
-#[test]
-fn test_array() {
-    let arr = arr2(
-        &[
-            [1 ,2 ,3 ,4 ,5],
-            [6 ,7 ,8 ,9 ,10],
-            [11,12,13,14,15],
-            [16,17,18,19,20],
-        ]
-    );
-    assert_eq!(arr.slice(s![.., ..]), arr);
-    let sub1 = arr2(
-        &[
-            [7 ,8 ,9 ],
-            [12,13,14],
-            [17,18,19],
-        ]
-    );
-    let sub2 = arr2(
-        &[
-            [7 ,8 ],
-            [12,13],
-            [17,18],
-        ]
-    );
-    let sub3 = arr2(
-        &[
-            [3 ,4 ,5],
-            [8 ,9 ,10],
-            [13,14,15],
-            [18,19,20]
-        ]
-    );
-    let filter1 = arr2(
-        &[
-            [2,2,2,2,2],
-            [2,2,2,2,2],
-            [2,2,2,2,2],
-            [2,2,2,2,2]
-        ]
-    );
-    let filter2 = arr2(
-        &[
-            [1,1,1,1,1],
-            [0,0,0,0,0],
-            [0,0,0,0,0],
-            [0,0,0,0,0]
-        ]
-    );
-    let expected = arr2(
-        &[
-            [1,2,3,4,5],
-            [0,0,0,0,0],
-            [0,0,0,0,0],
-            [0,0,0,0,0]
-        ]
-    );
-    assert_eq!(arr.slice(s![1..(2+2), 1..(2+2)]), sub1);
-    assert_eq!(arr.slice(s![1..4, 1..3]), sub2);
-    assert_eq!(arr.slice(s![.., 2..5]), sub3);
-    assert_eq!(arr[[1, 3]], 9);
-    assert_eq!(arr.clone() * filter1, arr.clone() * 2);
-    assert_eq!(arr.clone() * filter2, expected);
-    assert_eq!(arr.shape(), &[4, 5]);
-}
-
-
-
