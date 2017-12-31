@@ -10,19 +10,44 @@
                 src: url('https://cdn.leafscape.be/VLGothic/VL-Gothic-Regular_web.woff2')
                      format("woff2");
             }
+            img {
+                max-width: 400px;
+            }
+            div#app {
+                width: 850px;
+                margin: 50px auto 50px auto;
+                display: flex;
+                flex-flow: column;
+            }
+            div#view {
+                display: flex;
+                flex-flow: row;
+            }
+            textarea {
+                width:  400px;
+                height: 400px;
+            }
         </style>
     </head>
     <body>
-        <div id='app' :style='container_style'>
-            <div>
-                <input type='file' @change=setImage><br />
+        <div id='app'>
+            <div id='controller'>
+                image(png only): <input type='file' @change=setImage><br />
                 font size: <input type='number' v-model='font_size' style='width: 50px;'>px<br />
                 blocksize: <input type='number' v-model='options.blocksize' style='width: 50px;'><br /> 
                 character detect threth: <input type='number' v-model='options.char_detect_thresh' style='width: 50px;'><br />
                 line detect thresh: <input type='number' v-model='options.line_detect_thresh' style='width: 50px;'>
             </div>
-            <div>
-                <textarea :style="textarea_style">{{ aa }}</textarea>
+            <div id='view'>
+                <div>
+                    <div>
+                        <textarea :style="textarea_style">{{ aa }}</textarea>
+                        <span>{{ aa_text_count }}文字</span>
+                    </div>
+                </div>
+                <div>
+                    <img :src='imageUrl' />
+                </div>
             </div>
         </div>
         <script>
@@ -37,20 +62,13 @@
                 el: '#app',
                 data: {
                     image: null,
+                    imageUrl: '',
                     font_size: 9,
                     aa: '',
-                    container_style: {
-                        width: '850px',
-                        margin: '50px auto 50px auto'
-                    },
-                    textarea_style_base: {
-                        width: '800px',
-                        height: '400px'
-                    },
                     options: {
                         blocksize: 32,
                         char_detect_thresh: 10,
-                        line_detect_thresh: 10,
+                        line_detect_thresh: 200,
                     }
                 },
                 computed: {
@@ -59,6 +77,9 @@
                             {}, this.textarea_style_base,
                             {'font-size': `${this.font_size}px`, 'line-height': `${this.font_size}px`}
                         );
+                    },
+                    aa_text_count: function() {
+                        return this.aa.length;
                     }
                 },
                 methods: {
@@ -82,7 +103,14 @@
                         handler: function() { this.uploadImage() },
                         deep: true
                     },
-                    image: function() { this.uploadImage() },
+                    image: function() {
+                        this.uploadImage();
+                        const reader = new FileReader();
+                        reader.readAsDataURL(this.image);
+                        reader.addEventListener('load', () => {
+                            this.imageUrl = reader.result;
+                        });
+                    },
                 }
             })
         </script>
