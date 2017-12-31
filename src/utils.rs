@@ -1,10 +1,10 @@
 extern crate image;
 
 use ndarray::*;
-use std::fs::File;
 use image::{ImageDecoder, DecodingResult, ColorType};
 use string_error::{static_err};
 use std::error::Error;
+use std::io::{Read, Write};
 
 pub fn convolve2d(base_arr: &Array2<f32>, filter: &Array2<f32>) -> Array2<f32> {
     let ys: isize = base_arr.shape()[0] as isize;
@@ -18,7 +18,7 @@ pub fn convolve2d(base_arr: &Array2<f32>, filter: &Array2<f32>) -> Array2<f32> {
     return result;
 }
 
-pub fn read_png(image_file: File) -> Result<Array3<f32>, Box<Error>> {
+pub fn read_png(image_file: Box<Read>) -> Result<Array3<f32>, Box<Error>> {
     let mut decoder = image::png::PNGDecoder::new(image_file);
     let result = decoder.read_image()?;
     let (x, y) = decoder.dimensions()?;
@@ -36,7 +36,7 @@ pub fn read_png(image_file: File) -> Result<Array3<f32>, Box<Error>> {
 }
 
 
-pub fn write_grayscale_png(image_file: File, img: &Array2<f32>) -> Result<(), Box<Error>> {
+pub fn write_grayscale_png(image_file: Box<Write>, img: &Array2<f32>) -> Result<(), Box<Error>> {
     let decoder = image::png::PNGEncoder::new(image_file);
     let shape = img.shape();
     let height = shape[0] as u32;

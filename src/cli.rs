@@ -56,11 +56,11 @@ fn main() {
         shrink_filter.thresh = shrink_thresh_str.parse().unwrap();
     }
 
-    let image_array = utils::read_png(File::open(input_file).unwrap()).unwrap();
+    let image_array = utils::read_png(Box::new(File::open(input_file).unwrap())).unwrap();
     let grayscale_array = filter::grayscale::default().run(image_array);
     let gradient_array = filter::line::default().run(grayscale_array.clone());
     let line_array = shrink_filter.run(binary_filter.run(gradient_array)).mapv(|e| e as f32) * 250.;
-    utils::write_grayscale_png(File::create(String::from("out/line.png")).unwrap(), &line_array).unwrap();
+    utils::write_grayscale_png(Box::new(File::create(String::from("out/line.png")).unwrap()), &line_array).unwrap();
     let hough_array = hough_filter.run(line_array);
     let aa = filter::ascii_art::default().run(hough_array);
     println!("{}", aa);
