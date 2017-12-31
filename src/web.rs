@@ -31,8 +31,14 @@ struct Res {
 }
 
 #[post("/image", data = "<image_binary>")]
-fn image(/*options: Options,*/ image_binary: rocket::Data) -> Json<Res> {
+fn image_without_options(image_binary: rocket::Data) -> Json<Res> {
     let options = Options { blocksize: None, char_detect_thresh: None, line_detect_thresh: None };
+    image(options, image_binary)
+}
+
+
+#[post("/image?<options>", data = "<image_binary>")]
+fn image(options: Options, image_binary: rocket::Data) -> Json<Res> {
     let mut hough_filter = filter::block_hough::default();
     if let Some(block_size) = options.blocksize { hough_filter.block_size = block_size; }
     if let Some(slope_count_thresh) = options.char_detect_thresh { hough_filter.slope_count_thresh = slope_count_thresh; }
@@ -51,5 +57,5 @@ fn image(/*options: Options,*/ image_binary: rocket::Data) -> Json<Res> {
 }
 
 fn main() {
-    rocket::ignite().mount("/", routes![image]).launch();
+    rocket::ignite().mount("/", routes![image, image_without_options]).launch();
 }
