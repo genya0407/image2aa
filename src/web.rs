@@ -11,8 +11,10 @@ extern crate string_error;
 extern crate serde;
 extern crate serde_json;
 
+use std::io;
 use std::io::{Read, Cursor};
 use rocket_contrib::{Json, Value};
+use rocket::response::NamedFile;
 
 mod filter;
 mod utils;
@@ -30,12 +32,16 @@ struct Res {
     aa: String
 }
 
+#[get("/")]
+fn index() -> io::Result<NamedFile> {
+    NamedFile::open("static/index.html")
+}
+
 #[post("/image", data = "<image_binary>")]
 fn image_without_options(image_binary: rocket::Data) -> Json<Res> {
     let options = Options { blocksize: None, char_detect_thresh: None, line_detect_thresh: None };
     image(options, image_binary)
 }
-
 
 #[post("/image?<options>", data = "<image_binary>")]
 fn image(options: Options, image_binary: rocket::Data) -> Json<Res> {
@@ -57,5 +63,5 @@ fn image(options: Options, image_binary: rocket::Data) -> Json<Res> {
 }
 
 fn main() {
-    rocket::ignite().mount("/", routes![image, image_without_options]).launch();
+    rocket::ignite().mount("/", routes![index, image, image_without_options]).launch();
 }
