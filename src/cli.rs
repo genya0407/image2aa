@@ -5,48 +5,12 @@ extern crate image;
 extern crate string_error;
 extern crate getopts;
 
-use image::{ImageDecoder, DecodingResult, ColorType};
 use std::fs::File;
-use ndarray::*;
-use std::error::Error;
-use string_error::{static_err};
 use std::env;
 use getopts::Options;
 
 mod filter;
 mod utils;
-
-fn read_png(filename: String) -> Result<Array3<f32>, Box<Error>> {
-    let image_file = File::open(filename)?;
-    let mut decoder = image::png::PNGDecoder::new(image_file);
-    let result = decoder.read_image()?;
-    let (x, y) = decoder.dimensions()?;
-    match result {
-        DecodingResult::U8(v) => {
-            let arr = Array1::<f32>::from(v.into_iter().map(|e| e as f32).collect::<Vec<f32>>());
-            match decoder.colortype() {
-                Ok(ColorType::RGBA(_)) => arr.into_shape((y as Ix, x as Ix, 4 as Ix)).map_err(|_| static_err("Wrong shape!")),
-                Ok(ColorType::RGB(_)) => arr.into_shape((y as Ix, x as Ix, 3 as Ix)).map_err(|_| static_err("Wrong shape!")),
-                _ => Err(static_err("Unsupported colortype")),
-            }
-        }
-        DecodingResult::U16(_) => Err(static_err("Unsupported bit depth!"))
-    }
-}
-
-fn write_grayscale_png(filename: String, img: &Array2<f32>) -> Result<(), Box<Error>> {
-    let image_file = File::create(filename)?;
-    let decoder = image::png::PNGEncoder::new(image_file);
-    let shape = img.shape();
-    let height = shape[0] as u32;
-    let width = shape[1] as u32;
-    let u8img = img.clone().map(|e| *e as u8);
-    let data = u8img.as_slice().unwrap();
-    decoder.encode(
-        data,
-        width, height, ColorType::Gray(8)
-    ).map_err(|_| static_err("Error writing image!"))
-}
 
 fn setup_option_parser() -> Options {
     let mut opts = Options::new();
@@ -92,11 +56,11 @@ fn main() {
         shrink_filter.thresh = shrink_thresh_str.parse().unwrap();
     }
 
-    let image_array = read_png(input_file).unwrap();
+    let image_array = utils::read_png(File::open(input_file).unwrap()).unwrap();
     let grayscale_array = filter::grayscale::default().run(image_array);
     let gradient_array = filter::line::default().run(grayscale_array.clone());
     let line_array = shrink_filter.run(binary_filter.run(gradient_array)).mapv(|e| e as f32) * 250.;
-    write_grayscale_png(String::from("out/line.png"), &line_array).unwrap();
+    utils::write_grayscale_png(File::create(String::from("out/line.png")).unwrap(), &line_array).unwrap();
     let hough_array = hough_filter.run(line_array);
     let aa = filter::ascii_art::default().run(hough_array);
     println!("{}", aa);

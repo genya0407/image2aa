@@ -3,6 +3,8 @@
 
 #[macro_use] extern crate ndarray;
 extern crate rocket;
+extern crate image;
+extern crate string_error;
 
 mod filter;
 mod utils;
