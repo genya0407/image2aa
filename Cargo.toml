@@ -1,3 +1,11 @@
+[[bin]]
+name = "cli"
+path = "src/cli.rs"
+
+[[bin]]
+name = "web"
+path = "src/web.rs"
+
 [package]
 name = "png2aa"
 version = "0.1.0"
@@ -8,3 +16,5 @@ ndarray = { version = "0.10.0" }
 image = "*"
 string-error = "0.1.0"
 getopts = "0.2"
+rocket = "0.3.5"
+rocket_codegen = "0.3.5"

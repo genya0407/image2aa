@@ -1,5 +1,4 @@
 #![feature(slice_patterns)]
-//#[macro_use(s)]
 
 extern crate image;
 #[macro_use] extern crate ndarray;
@@ -15,6 +14,7 @@ use std::env;
 use getopts::Options;
 
 mod filter;
+mod utils;
 
 fn read_png(filename: String) -> Result<Array3<f32>, Box<Error>> {
     let image_file = File::open(filename)?;
@@ -54,6 +54,7 @@ fn setup_option_parser() -> Options {
     opts.optopt("i", "input", "input file path", "FILE");
     opts.optopt("", "char-detect-thresh", "threshould for character detection (default: 10)", "THRESH");
     opts.optopt("", "line-detect-thresh", "threshould for line detection (default: 10)", "THRESH");
+    opts.optopt("", "shrink-thresh", "threshould for shrink (default: 5)", "THRESH");
     opts.optflag("", "help", "");
     return opts;
 }
@@ -86,10 +87,15 @@ fn main() {
         binary_filter.thresh = line_detect_thresh_str.parse().unwrap();
     }
 
+    let mut shrink_filter = filter::shrink::default();
+    if let Some(shrink_thresh_str) = matches.opt_str("shrink-thresh") {
+        shrink_filter.thresh = shrink_thresh_str.parse().unwrap();
+    }
+
     let image_array = read_png(input_file).unwrap();
     let grayscale_array = filter::grayscale::default().run(image_array);
     let gradient_array = filter::line::default().run(grayscale_array.clone());
-    let line_array = binary_filter.run(gradient_array);
+    let line_array = shrink_filter.run(binary_filter.run(gradient_array)).mapv(|e| e as f32) * 250.;
     write_grayscale_png(String::from("out/line.png"), &line_array).unwrap();
     let hough_array = hough_filter.run(line_array);
     let aa = filter::ascii_art::default().run(hough_array);
