@@ -51,6 +51,9 @@
                     <button v-on:click='options.line_detect_thresh += 10'>+</button>
                     <button v-on:click='options.line_detect_thresh -= 10'>-</button>
                 </p>
+                <p>
+                    <button @click='getAA' :disabled='isLoading'>更新</button>
+                </p>
             </div>
             <div id='view'>
                 <div>
@@ -80,6 +83,7 @@
                     imageUrl: '',
                     font_size: 9,
                     aa: '',
+                    isLoading: false,
                     options: {
                         blocksize: 32,
                         char_detect_thresh: 10,
@@ -117,16 +121,16 @@
                             });
                     },
                     getAA: function() {
+                        this.isLoading = true;
                         this.$http
                             .get(`/image/${this.imageUuid}?${this.optionQueryString}`)
-                            .then(response => this.aa = response.body.aa);
+                            .then(response => {
+                                this.aa = response.body.aa;
+                                this.isLoading = false;
+                            });
                     }
                 },
                 watch: {
-                    options: {
-                        handler: function() { this.getAA() },
-                        deep: true
-                    },
                     image: function() {
                         this.uploadImage();
                         const reader = new FileReader();
