@@ -112,7 +112,7 @@
                         }
                         this.image = files[0];
                     },
-                    uploadImage: function(){
+                    uploadImage: function() {
                         this.$http
                             .post('/load_image', this.image, { headers: { 'Content-Type': 'multipart/form-data' }})
                             .then(response => {
@@ -123,7 +123,7 @@
                     getAA: function() {
                         this.isLoading = true;
                         this.$http
-                            .get(`/image/${this.imageUuid}?${this.optionQueryString}`)
+                            .get(`/aa/${this.imageUuid}?${this.optionQueryString}`)
                             .then(response => {
                                 this.aa = response.body.aa;
                                 this.isLoading = false;

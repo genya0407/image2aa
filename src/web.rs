@@ -56,14 +56,14 @@ fn load_image(image_binary: rocket::Data, image_store: rocket::State<RwLock<Imag
     uuid
 }
 
-#[get("/image/<image_uuid>")]
-fn image_without_options(image_uuid: String, image_store: rocket::State<RwLock<ImageStore>>) -> Json<Res> {
+#[get("/aa/<image_uuid>")]
+fn aa_without_options(image_uuid: String, image_store: rocket::State<RwLock<ImageStore>>) -> Json<Res> {
     let options = Options { blocksize: None, char_detect_thresh: None, line_detect_thresh: None };
-    image(image_uuid, image_store, options)
+    aa(image_uuid, image_store, options)
 }
 
-#[get("/image/<image_uuid>?<options>")]
-fn image(image_uuid: String, image_store: rocket::State<RwLock<ImageStore>>, options: Options) -> Json<Res> {
+#[get("/aa/<image_uuid>?<options>")]
+fn aa(image_uuid: String, image_store: rocket::State<RwLock<ImageStore>>, options: Options) -> Json<Res> {
     let mut hough_filter = filter::block_hough::default();
     if let Some(block_size) = options.blocksize { hough_filter.block_size = block_size; }
     if let Some(slope_count_thresh) = options.char_detect_thresh { hough_filter.slope_count_thresh = slope_count_thresh; }
@@ -97,6 +97,6 @@ impl ImageStore {
 fn main() {
     rocket::ignite()
         .manage(RwLock::new(ImageStore { image_hashmap: HashMap::new() }))
-        .mount("/", routes![index, image, image_without_options, load_image])
+        .mount("/", routes![index, aa, aa_without_options, load_image])
         .launch();
 }
