@@ -10,11 +10,15 @@ extern crate string_error;
 #[macro_use] extern crate serde_derive;
 extern crate serde;
 extern crate serde_json;
+extern crate uuid;
 
+use uuid::Uuid;
 use std::io;
-use std::io::{Read, Cursor};
-use rocket_contrib::{Json, Value};
+use rocket_contrib::Json;
 use rocket::response::NamedFile;
+use std::collections::HashMap;
+use ndarray::Array3;
+use std::sync::RwLock;
 
 mod filter;
 mod utils;
@@ -37,14 +41,29 @@ fn index() -> io::Result<NamedFile> {
     NamedFile::open("static/index.html")
 }
 
-#[post("/image", data = "<image_binary>")]
-fn image_without_options(image_binary: rocket::Data) -> Json<Res> {
-    let options = Options { blocksize: None, char_detect_thresh: None, line_detect_thresh: None };
-    image(options, image_binary)
+#[post("/load_image", data = "<image_binary>")]
+fn load_image(image_binary: rocket::Data, image_store: rocket::State<RwLock<ImageStore>>) -> String {
+    {
+        let im_store_read = image_store.read().unwrap();
+        for key in im_store_read.image_hashmap.keys() {
+            println!("{}", key);
+        }
+    }
+    let uuid = Uuid::new_v4().simple().to_string();
+    let image_array = utils::read_png(Box::new(image_binary.open())).map_err(|e| println!("{}", e)).unwrap();
+    let mut im_store = image_store.write().unwrap();
+    im_store.image_hashmap.insert(uuid.clone(), image_array);
+    uuid
 }
 
-#[post("/image?<options>", data = "<image_binary>")]
-fn image(options: Options, image_binary: rocket::Data) -> Json<Res> {
+#[get("/image/<image_uuid>")]
+fn image_without_options(image_uuid: String, image_store: rocket::State<RwLock<ImageStore>>) -> Json<Res> {
+    let options = Options { blocksize: None, char_detect_thresh: None, line_detect_thresh: None };
+    image(image_uuid, image_store, options)
+}
+
+#[get("/image/<image_uuid>?<options>")]
+fn image(image_uuid: String, image_store: rocket::State<RwLock<ImageStore>>, options: Options) -> Json<Res> {
     let mut hough_filter = filter::block_hough::default();
     if let Some(block_size) = options.blocksize { hough_filter.block_size = block_size; }
     if let Some(slope_count_thresh) = options.char_detect_thresh { hough_filter.slope_count_thresh = slope_count_thresh; }
@@ -52,16 +71,32 @@ fn image(options: Options, image_binary: rocket::Data) -> Json<Res> {
     let mut binary_filter = filter::binary::default();
     if let Some(thresh) = options.line_detect_thresh { binary_filter.thresh = thresh; }
 
-    let image_array = utils::read_png(Box::new(image_binary.open())).map_err(|e| println!("{}", e)).unwrap();
+    if let Some(image_array) = image_store.read().unwrap().get(image_uuid) {
+        let grayscale_array = filter::grayscale::default().run(image_array);
+        let gradient_array = filter::line::default().run(grayscale_array.clone());
+        let line_array = binary_filter.run(gradient_array).mapv(|e| e as f32) * 250.;
+        let hough_array = hough_filter.run(line_array);
+        let aa = filter::ascii_art::default().run(hough_array);
+        Json(Res { aa: aa })
+    } else {
+        Json(Res { aa: String::from("") })
+    }
+}
 
-    let grayscale_array = filter::grayscale::default().run(image_array);
-    let gradient_array = filter::line::default().run(grayscale_array.clone());
-    let line_array = binary_filter.run(gradient_array).mapv(|e| e as f32) * 250.;
-    let hough_array = hough_filter.run(line_array);
-    let aa = filter::ascii_art::default().run(hough_array);
-    Json(Res { aa: aa })
+#[derive(Debug)]
+struct ImageStore {
+    pub image_hashmap: HashMap<String, Array3<f32>>
+}
+
+impl ImageStore {
+    pub fn get(&self, uuid: String) -> Option<Array3<f32>> {
+        self.image_hashmap.get(&uuid).map(|arr| arr.clone())
+    }
 }
 
 fn main() {
-    rocket::ignite().mount("/", routes![index, image, image_without_options]).launch();
+    rocket::ignite()
+        .manage(RwLock::new(ImageStore { image_hashmap: HashMap::new() }))
+        .mount("/", routes![index, image, image_without_options, load_image])
+        .launch();
 }

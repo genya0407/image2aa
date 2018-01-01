@@ -5,7 +5,7 @@ use std::f32;
 pub fn default() -> BlockHoughFilter {
     BlockHoughFilter{
         block_size: 32,
-        theta_resolution: 100,
+        theta_resolution: 20,
         slope_count_thresh: 10
     }
 }

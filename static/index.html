@@ -32,11 +32,25 @@
     <body>
         <div id='app'>
             <div id='controller'>
-                image(png only): <input type='file' @change=setImage><br />
-                font size: <input type='number' v-model='font_size' style='width: 50px;'>px<br />
-                blocksize: <input type='number' v-model='options.blocksize' style='width: 50px;'><br /> 
-                character detect threth: <input type='number' v-model='options.char_detect_thresh' style='width: 50px;'><br />
-                line detect thresh: <input type='number' v-model='options.line_detect_thresh' style='width: 50px;'>
+                <p>image(png only): <input type='file' @change=setImage></p>
+                <p>
+                    font size: <input type='number' v-model='font_size' style='width: 50px;'>px
+                </p>
+                <p>
+                    blocksize: <input type='number' v-model='options.blocksize' style='width: 50px;'>
+                    <button v-on:click='options.blocksize += 10'>+</button>
+                    <button v-on:click='options.blocksize -= 10'>-</button>
+                </p>
+                <p>
+                    character detect threth: <input type='number' v-model='options.char_detect_thresh' style='width: 50px;'>
+                    <button v-on:click='options.char_detect_thresh += 10'>+</button>
+                    <button v-on:click='options.char_detect_thresh -= 10'>-</button>
+                </p>
+                <p>
+                    line detect thresh: <input type='number' v-model='options.line_detect_thresh' style='width: 50px;'>
+                    <button v-on:click='options.line_detect_thresh += 10'>+</button>
+                    <button v-on:click='options.line_detect_thresh -= 10'>-</button>
+                </p>
             </div>
             <div id='view'>
                 <div>
@@ -62,6 +76,7 @@
                 el: '#app',
                 data: {
                     image: null,
+                    imageUuid: '',
                     imageUrl: '',
                     font_size: 9,
                     aa: '',
@@ -80,12 +95,12 @@
                     },
                     aa_text_count: function() {
                         return this.aa.length;
-                    }
+                    },
+                    optionQueryString: function() {
+                        return queryString(this.options);
+                    },
                 },
                 methods: {
-                    setAA: function () {
-                        this.aa = this.message.split('').reverse().join('')
-                    },
                     setImage: function(e) {
                         const files = e.target.files || e.dataTransfer.files;
                         if (!files.length) {
@@ -94,13 +109,22 @@
                         this.image = files[0];
                     },
                     uploadImage: function(){
-                        this.$http.post('/image?'+queryString(this.options), this.image, { headers: { 'Content-Type': 'multipart/form-data' }})
-                                    .then(response => { this.aa = response.body.aa });
+                        this.$http
+                            .post('/load_image', this.image, { headers: { 'Content-Type': 'multipart/form-data' }})
+                            .then(response => {
+                                this.imageUuid = response.body;
+                                this.getAA();
+                            });
                     },
+                    getAA: function() {
+                        this.$http
+                            .get(`/image/${this.imageUuid}?${this.optionQueryString}`)
+                            .then(response => this.aa = response.body.aa);
+                    }
                 },
                 watch: {
                     options: {
-                        handler: function() { this.uploadImage() },
+                        handler: function() { this.getAA() },
                         deep: true
                     },
                     image: function() {
