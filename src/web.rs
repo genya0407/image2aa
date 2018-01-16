@@ -15,13 +15,28 @@ extern crate uuid;
 use uuid::Uuid;
 use std::io;
 use rocket_contrib::Json;
-use rocket::response::NamedFile;
+use rocket::response::{NamedFile, Stream};
 use std::collections::HashMap;
 use ndarray::Array3;
 use std::sync::RwLock;
+use std::fs::File;
+use std::io::Read;
 
 mod filter;
 mod utils;
+
+fn hough_filter_with_options(options: &Options) -> filter::block_hough::BlockHoughFilter {
+    let mut hough_filter = filter::block_hough::default();
+    if let Some(block_size) = options.blocksize { hough_filter.block_size = block_size; }
+    if let Some(slope_count_thresh) = options.char_detect_thresh { hough_filter.slope_count_thresh = slope_count_thresh; }
+    return hough_filter;    
+}
+
+fn binary_filter_with_options(options: &Options) -> filter::binary::BinaryFilter {
+    let mut binary_filter = filter::binary::default();
+    if let Some(thresh) = options.line_detect_thresh { binary_filter.thresh = thresh; }
+    return binary_filter;
+}
 
 #[derive(FromForm)]
 struct Options {
@@ -29,7 +44,6 @@ struct Options {
     char_detect_thresh: Option<u32>,
     line_detect_thresh: Option<u32>
 }
-
 
 #[derive(Serialize)]
 struct Res {
@@ -56,6 +70,28 @@ fn load_image(image_binary: rocket::Data, image_store: rocket::State<RwLock<Imag
     uuid
 }
 
+fn grayscale_image(
+        image_uuid: String, options: Options,
+        image_store: rocket::State<RwLock<ImageStore>>
+    ) -> io::Result<Stream<Read>> {
+    let binary_filter = binary_filter_with_options(&options);
+    let grayscale_filter = filter::grayscale::default();
+    let gradient_filter = filter::line::default();
+
+    if let Some(image_array) = image_store.read().unwrap().get(image_uuid) {
+        let grayscale_array = grayscale_filter.run(image_array);
+        let gradient_array = gradient_filter.run(grayscale_array);
+        let line_array = binary_filter.run(gradient_array).mapv(|e| e as f32) * 250.;
+        let mut buff = io::Cursor::new(Vec::<u8>::new());
+        utils::write_grayscale_png(Box::new(buff), &line_array);
+
+        Ok(Stream::from(buff))
+    } else {
+        panic!("no such image!")
+    }
+
+}
+
 #[get("/aa/<image_uuid>")]
 fn aa_without_options(image_uuid: String, image_store: rocket::State<RwLock<ImageStore>>) -> Json<Res> {
     let options = Options { blocksize: None, char_detect_thresh: None, line_detect_thresh: None };
@@ -64,19 +100,18 @@ fn aa_without_options(image_uuid: String, image_store: rocket::State<RwLock<Imag
 
 #[get("/aa/<image_uuid>?<options>")]
 fn aa(image_uuid: String, image_store: rocket::State<RwLock<ImageStore>>, options: Options) -> Json<Res> {
-    let mut hough_filter = filter::block_hough::default();
-    if let Some(block_size) = options.blocksize { hough_filter.block_size = block_size; }
-    if let Some(slope_count_thresh) = options.char_detect_thresh { hough_filter.slope_count_thresh = slope_count_thresh; }
-
-    let mut binary_filter = filter::binary::default();
-    if let Some(thresh) = options.line_detect_thresh { binary_filter.thresh = thresh; }
+    let hough_filter = hough_filter_with_options(&options);
+    let binary_filter = binary_filter_with_options(&options);
+    let grayscale_filter = filter::grayscale::default();
+    let gradient_filter = filter::line::default();
+    let ascii_art_filter = filter::ascii_art::default();
 
     if let Some(image_array) = image_store.read().unwrap().get(image_uuid) {
-        let grayscale_array = filter::grayscale::default().run(image_array);
-        let gradient_array = filter::line::default().run(grayscale_array.clone());
+        let grayscale_array = grayscale_filter.run(image_array);
+        let gradient_array = gradient_filter.run(grayscale_array.clone());
         let line_array = binary_filter.run(gradient_array).mapv(|e| e as f32) * 250.;
         let hough_array = hough_filter.run(line_array);
-        let aa = filter::ascii_art::default().run(hough_array);
+        let aa = ascii_art_filter.run(hough_array);
         Json(Res { aa: aa })
     } else {
         Json(Res { aa: String::from("") })

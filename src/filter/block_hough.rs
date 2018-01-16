@@ -16,8 +16,20 @@ pub struct BlockHoughFilter {
     pub slope_count_thresh: u32
 }
 
-fn modulo(a: i32, b: i32) -> i32 {
-    ((a % b) + b) % b
+pub struct HoughContainer {
+    data: Array2<u32>,
+    rho_offset: usize,
+}
+
+impl HoughContainer {
+    pub fn new(max_rho: usize, max_slope: usize) -> Self {
+        let data = Array2::<u32>::zeros((max_rho * 2, max_slope));
+        Self { data: data }
+    }
+
+    pub fn count_up(&mut self, rho_i: usize, slope_i: usize) {
+        self[]
+    }
 }
 
 impl BlockHoughFilter {
@@ -39,7 +51,7 @@ impl BlockHoughFilter {
                 let max_slope_i = max_rho_slope_indexes.1;
                 if block_rho_slope[[max_rho_i, max_slope_i]] > self.slope_count_thresh {
                     maximum_rho_slopes[[y_block_i, x_block_i, 0]] = self.index2slope(max_slope_i);
-                    maximum_rho_slopes[[y_block_i, x_block_i, 1]] = max_rho_i as f32;
+                    maximum_rho_slopes[[y_block_i, x_block_i, 1]] = (max_rho_i as f32)/(self.block_size as f32);
                 } else {
                     maximum_rho_slopes[[y_block_i, x_block_i, 0]] = f32::NAN;
                     maximum_rho_slopes[[y_block_i, x_block_i, 1]] = f32::NAN;
@@ -57,7 +69,7 @@ impl BlockHoughFilter {
         let max_rho_i = (f32::sqrt(xs_f.powi(2)+ys_f.powi(2)+xs_f*ys_f) + 1.) as usize;
         let max_slope_i = self.theta_resolution as usize;
         // y方向: rho, x方向: theta_i
-        let mut rho_theta = Array2::<u32>::zeros((max_rho_i, max_slope_i));
+        let mut rho_theta = ;
         for y in 0..ys {
             for x in 0..xs {
                 if block[[y, x]] > 0. {
@@ -77,6 +89,7 @@ impl BlockHoughFilter {
     }
 
     fn calc_rho(&self, x: f32, y: f32, slope: f32) -> f32 {
-        return x * f32::cos(slope) + y * f32::sin(slope)
+        let rho = x * f32::cos(slope) + y * f32::sin(slope);
+        return rho
     }
 }

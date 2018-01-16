@@ -35,7 +35,6 @@ pub fn read_png(image_file: Box<Read>) -> Result<Array3<f32>, Box<Error>> {
     }
 }
 
-
 pub fn write_grayscale_png(image_file: Box<Write>, img: &Array2<f32>) -> Result<(), Box<Error>> {
     let decoder = image::png::PNGEncoder::new(image_file);
     let shape = img.shape();
