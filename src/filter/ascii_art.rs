@@ -37,19 +37,19 @@ pub fn default() -> AsciiArtFilter {
         new_char(1./2.*f32::consts::PI, 0.5,  "ー"),
         new_char(1./2.*f32::consts::PI, 0.75, "＿"),
         new_char(3./4.*f32::consts::PI, 3./f32::sqrt(32.), ". "),
-        new_char(3./4.*f32::consts::PI, 1./f32::sqrt(2.),  "＼"),
-        //new_char(3./4.*f32::consts::PI, 7./f32::sqrt(32.),  " \""),
+        new_char(3./4.*f32::consts::PI, 0.,  "＼"),
+        new_char(3./4.*f32::consts::PI, -3./f32::sqrt(32.),  " \""),
         new_char(
             f32::consts::PI - f32::asin(1./f32::sqrt(5.)),
             0.,
             "\\ "),
         new_char(
             f32::consts::PI - f32::asin(1./f32::sqrt(5.)),
-            0.5/f32::sqrt(5.),
+            - 0.5/f32::sqrt(5.),
             "＼"),
         new_char(
             f32::consts::PI - f32::asin(1./f32::sqrt(5.)),
-            1./f32::sqrt(5.),
+            - 1./f32::sqrt(5.),
             " \\"),
     ];
 
