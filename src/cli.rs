@@ -31,7 +31,7 @@ fn main() {
         Err(f) => panic!(f.to_string())
     };
 
-    if matches.opt_present("help") {
+    if !matches.opt_present("i") || matches.opt_present("help") {
         println!("{}", parser.short_usage("png2aa"));
         return;
     }
@@ -60,7 +60,6 @@ fn main() {
     let grayscale_array = filter::grayscale::default().run(image_array);
     let gradient_array = filter::line::default().run(grayscale_array.clone());
     let line_array = shrink_filter.run(binary_filter.run(gradient_array)).mapv(|e| e as f32) * 250.;
-    utils::write_grayscale_png(Box::new(File::create(String::from("out/line.png")).unwrap()), &line_array).unwrap();
     let hough_array = hough_filter.run(line_array);
     let aa = filter::ascii_art::default().run(hough_array);
     println!("{}", aa);

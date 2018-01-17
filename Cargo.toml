@@ -1,9 +1,9 @@
 [[bin]]
-name = "cli"
+name = "png2aa"
 path = "src/cli.rs"
 
 [[bin]]
-name = "web"
+name = "png2aa-web"
 path = "src/web.rs"
 
 [package]
