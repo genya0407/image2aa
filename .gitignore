@@ -1,4 +1,5 @@
-/target/
+/target/debug
+/target/release
 **/*.rs.bk
 out/
 image/
