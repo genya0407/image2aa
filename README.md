@@ -2,10 +2,6 @@
 
 Convert PNG image file to ascii art.
 
-## Versions
-
-This package requires rustc version `nightly-2017-12-21`.
-
 ## Run
 
 ### CLI tool
