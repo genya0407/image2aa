@@ -15,6 +15,7 @@ keywords = ["image", "png"]
 license-file = "LICENSE"
 readme = "README.md"
 description = "Convert PNG image to ASCII Art."
+documentation = "https://genya0407.github.io/png2aa/target/doc/png2aa/index.html"
 
 [dependencies]
 ndarray = { version = "0.10.0" }
