@@ -1,14 +1,6 @@
-[[bin]]
-name = "png2aa"
-path = "src/cli.rs"
-
-[[bin]]
-name = "png2aa-web"
-path = "src/web.rs"
-
 [package]
 name = "png2aa"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Yusuke Sangenya (genya0407) <longinus.eva@gmail.com>"]
 repository = "https://github.com/genya0407/png2aa"
 keywords = ["image", "png"]
@@ -16,6 +8,14 @@ license-file = "LICENSE"
 readme = "README.md"
 description = "Convert PNG image to ASCII Art."
 documentation = "https://genya0407.github.io/png2aa/target/doc/png2aa/index.html"
+
+[[bin]]
+name = "png2aa"
+path = "src/cli.rs"
+
+[[bin]]
+name = "png2aa-web"
+path = "src/web.rs"
 
 [dependencies]
 ndarray = { version = "0.10.0" }
