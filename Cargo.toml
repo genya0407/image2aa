@@ -19,7 +19,7 @@ documentation = "https://genya0407.github.io/png2aa/target/doc/png2aa/index.html
 
 [dependencies]
 ndarray = { version = "0.10.0" }
-image = "*"
+image = "0.18.0"
 string-error = "0.1.0"
 getopts = "0.2"
 rocket = "0.3.5"
@@ -31,6 +31,6 @@ base64 = "~0.6.0"
 uuid = { version = "0.5", features = ["v4"] }
 
 [dependencies.rocket_contrib]
-version = "*"
+version = "0.3.5"
 default-features = false
 features = ["json"]
