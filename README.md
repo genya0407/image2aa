@@ -2,36 +2,24 @@
 
 Convert PNG image file to ascii art.
 
+## Install
+
+```shell-session
+$ cargo install png2aa
+```
+
 ## Run
 
 ### CLI tool
 
-Run with `cargo run`:
-
 ```shell-session
-$ cargo run --release --bin png2aa -- -i path/to/image.ong
-```
-
-Or, build binary:
-
-```shell-session
-$ cargo build --release --bin png2aa
-$ ./target/release/png2aa -i path/to/image.png
+$ png2aa -i path/to/image.png
 ```
 
 ### Web application
 
-Run with `cargo run`:
-
 ```shell-session
-$ cargo run --release --bin png2aa-web
+$ png2aa-web
 ```
 
 Then, go to [http://localhost:8000](http://localhost:8000).
-
-Or, build binary:
-
-```shell-session
-$ cargo build --release --bin png2aa-web
-$ ./target/release/png2aa-web
-```
