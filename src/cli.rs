@@ -38,7 +38,7 @@ fn main() {
 
     let input_file = matches.opt_str("i").unwrap();
 
-    let mut hough_filter = filter::block_hough::default();
+    let mut hough_filter = filter::hough::default();
     if let Some(block_size_str) = matches.opt_str("s") {
         hough_filter.block_size = block_size_str.parse().unwrap();
     }

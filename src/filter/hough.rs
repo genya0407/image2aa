@@ -2,15 +2,15 @@ extern crate ndarray;
 use ndarray::*;
 use std::f32;
 
-pub fn default() -> BlockHoughFilter {
-    BlockHoughFilter{
+pub fn default() -> HoughFilter {
+    HoughFilter{
         block_size: 32,
         theta_resolution: 20,
         slope_count_thresh: 0
     }
 }
 
-pub struct BlockHoughFilter {
+pub struct HoughFilter {
     pub block_size: usize,
     pub theta_resolution: usize,
     pub slope_count_thresh: u32
@@ -44,7 +44,7 @@ impl HoughContainer {
     }
 }
 
-impl BlockHoughFilter {
+impl HoughFilter {
     pub fn run (&self, img: Array2<f32>) -> Array3<f32> {
         let ys = img.shape()[0];
         let xs = img.shape()[1];

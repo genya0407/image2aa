@@ -45,7 +45,7 @@ fn image_without_options(image_binary: rocket::Data) -> Json<Res> {
 
 #[post("/image?<options>", data = "<image_binary>")]
 fn image(options: Options, image_binary: rocket::Data) -> Json<Res> {
-    let mut hough_filter = filter::block_hough::default();
+    let mut hough_filter = filter::hough::default();
     if let Some(block_size) = options.blocksize { hough_filter.block_size = block_size; }
     if let Some(slope_count_thresh) = options.char_detect_thresh { hough_filter.slope_count_thresh = slope_count_thresh; }
 
