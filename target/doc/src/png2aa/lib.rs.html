@@ -4,14 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `src/filter/mod.rs`.">
+    <meta name="description" content="Source to the Rust file `src/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
-    <title>mod.rs.html -- source</title>
+    <title>lib.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
     
 
     
@@ -51,12 +51,12 @@
 <span id="5">5</span>
 <span id="6">6</span>
 </pre><pre class="rust ">
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">grayscale</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">line</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">binary</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">hough</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ascii_art</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">shrink</span>;</pre>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">image</span>;
+<span class="attribute">#[<span class="ident">macro_use</span>]</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">ndarray</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">string_error</span>;
+
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">filter</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">utils</span>;</pre>
 </section>
     <section id='search' class="content hidden"></section>
 
@@ -113,10 +113,10 @@
     
 
     <script>
-        window.rootPath = "../../../";
+        window.rootPath = "../../";
         window.currentCrate = "png2aa";
     </script>
-    <script src="../../../main.js"></script>
-    <script defer src="../../../search-index.js"></script>
+    <script src="../../main.js"></script>
+    <script defer src="../../search-index.js"></script>
 </body>
 </html>
