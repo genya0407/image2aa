@@ -221,7 +221,7 @@ dependencies = [
 
 [[package]]
 name = "png2aa"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "base64 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "getopts 0.2.15 (registry+https://github.com/rust-lang/crates.io-index)",
