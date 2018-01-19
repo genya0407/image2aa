@@ -13,24 +13,9 @@ documentation = "https://genya0407.github.io/png2aa/target/doc/png2aa/index.html
 name = "png2aa"
 path = "src/cli.rs"
 
-[[bin]]
-name = "png2aa-web"
-path = "src/web.rs"
-
 [dependencies]
 ndarray = { version = "0.10.0" }
 image = "0.18.0"
 string-error = "0.1.0"
 getopts = "0.2"
-rocket = "0.3.6"
-rocket_codegen = "0.3.6"
-serde = "1.0.27"
-serde_derive = "1.0.27"
-serde_json = "1.0"
 base64 = "~0.6.0"
-uuid = { version = "0.5", features = ["v4"] }
-
-[dependencies.rocket_contrib]
-version = "0.3.6"
-default-features = false
-features = ["json"]
