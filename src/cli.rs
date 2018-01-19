@@ -1,16 +1,12 @@
 #![feature(slice_patterns)]
 
-extern crate image;
-#[macro_use] extern crate ndarray;
-extern crate string_error;
 extern crate getopts;
+extern crate png2aa;
 
 use std::fs::File;
 use std::env;
 use getopts::Options;
-
-mod filter;
-mod utils;
+use png2aa::{filter, utils};
 
 fn setup_option_parser() -> Options {
     let mut opts = Options::new();
