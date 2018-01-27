@@ -1,15 +1,16 @@
-# png2aa
+# image2aa
 
-Convert PNG image file to ascii art.
+Convert image file to ascii art.
 
 ## Install
 
 ```shell-session
-$ cargo install png2aa
+$ cd image2aa/
+$ cargo install
 ```
 
 ## Run
 
 ```shell-session
-$ png2aa -i path/to/image.png
+$ image2aa -i path/to/image.png
 ```
