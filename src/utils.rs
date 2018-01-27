@@ -23,24 +23,17 @@ pub fn read_image<R: Read>(mut image_file: R) -> Result<Array3<f32>, Box<Error>>
     image_file.read_to_end(&mut image_buffer)?;
     let format = image::guess_format(&image_buffer)?;
     let image_reader = Cursor::new(image_buffer);
-    let abstract_image_data = match format {
-        image::ImageFormat::PNG => {
-            let mut decoder = image::png::PNGDecoder::new(image_reader);
-            let result = decoder.read_image()?;
-            let (x, y) = decoder.dimensions()?;
-            let colortype = decoder.colortype()?;
-            Ok((result, (x, y), colortype))
-        },
-        image::ImageFormat::JPEG => {
-            let mut decoder = image::jpeg::JPEGDecoder::new(image_reader);
-            let result = decoder.read_image()?;
-            let (x, y) = decoder.dimensions()?;
-            let colortype = decoder.colortype()?;
-            Ok((result, (x, y), colortype))
-        },
+    match format {
+        image::ImageFormat::PNG => read_to_array(image::png::PNGDecoder::new(image_reader)),
+        image::ImageFormat::JPEG => read_to_array(image::jpeg::JPEGDecoder::new(image_reader)),
         _ => Err(static_err("Unsupported file type. Only PNG and JPEG are supported.")),
-    };
-    let (result, (x, y), colortype) = abstract_image_data?;
+    }
+}
+
+fn read_to_array<D: ImageDecoder>(mut decoder: D) -> Result<Array3<f32>, Box<Error>> {
+    let result = decoder.read_image()?;
+    let (x, y) = decoder.dimensions()?;
+    let colortype = decoder.colortype()?;
     
     let raw_data = match result {
         DecodingResult::U8(v) => v.into_iter().map(|e| e as f32).collect::<Vec<f32>>(),
