@@ -19,19 +19,24 @@ pub fn convolve2d(base_arr: &Array2<f32>, filter: &Array2<f32>) -> Array2<f32> {
 }
 
 pub fn read_png(image_file: Box<Read>) -> Result<Array3<f32>, Box<Error>> {
-    let mut decoder = image::png::PNGDecoder::new(image_file);
+    let decoder = image::png::PNGDecoder::new(image_file);
+    read_image(decoder)
+}
+
+pub fn read_image<D:ImageDecoder>(mut decoder: D) -> Result<Array3<f32>, Box<Error>> {
     let result = decoder.read_image()?;
     let (x, y) = decoder.dimensions()?;
-    match result {
-        DecodingResult::U8(v) => {
-            let arr = Array1::<f32>::from(v.into_iter().map(|e| e as f32).collect::<Vec<f32>>());
-            match decoder.colortype() {
-                Ok(ColorType::RGBA(_)) => arr.into_shape((y as Ix, x as Ix, 4 as Ix)).map_err(|_| static_err("Wrong shape!")),
-                Ok(ColorType::RGB(_)) => arr.into_shape((y as Ix, x as Ix, 3 as Ix)).map_err(|_| static_err("Wrong shape!")),
-                _ => Err(static_err("Unsupported colortype")),
-            }
-        }
-        DecodingResult::U16(_) => Err(static_err("Unsupported bit depth!"))
+    let raw_data = match result {
+        DecodingResult::U8(v) => v.into_iter().map(|e| e as f32).collect::<Vec<f32>>(),
+        DecodingResult::U16(v) => v.into_iter().map(|e| e as f32).collect::<Vec<f32>>(),
+    };
+    let arr = Array1::<f32>::from(raw_data);
+    match decoder.colortype() {
+        Ok(ColorType::RGBA(_)) =>
+            arr.into_shape((y as Ix, x as Ix, 4 as Ix)).map_err(|_| static_err("Wrong shape!")),
+        Ok(ColorType::RGB(_)) =>
+            arr.into_shape((y as Ix, x as Ix, 3 as Ix)).map_err(|_| static_err("Wrong shape!")),
+        _ => Err(static_err("Unsupported colortype")),
     }
 }
 
