@@ -52,7 +52,7 @@ fn main() {
         shrink_filter.thresh = shrink_thresh_str.parse().unwrap();
     }
 
-    let image_array = utils::read_png(Box::new(File::open(input_file).unwrap())).unwrap();
+    let image_array = utils::read_png(File::open(input_file).unwrap()).unwrap();
     let grayscale_array = filter::grayscale::default().run(image_array);
     let gradient_array = filter::line::default().run(grayscale_array.clone());
     let line_array = shrink_filter.run(binary_filter.run(gradient_array)).mapv(|e| e as f32) * 250.;

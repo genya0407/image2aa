@@ -18,7 +18,7 @@ pub fn convolve2d(base_arr: &Array2<f32>, filter: &Array2<f32>) -> Array2<f32> {
     return result;
 }
 
-pub fn read_png(image_file: Box<Read>) -> Result<Array3<f32>, Box<Error>> {
+pub fn read_png<R: Read>(image_file: R) -> Result<Array3<f32>, Box<Error>> {
     let decoder = image::png::PNGDecoder::new(image_file);
     read_image(decoder)
 }
