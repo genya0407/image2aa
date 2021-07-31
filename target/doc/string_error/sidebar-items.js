@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["into_err","Creates an error trait object for an owned string (`String`)."],["new_err","Creates an error trait object for a string (`&str`)."],["static_err","Creates an error trait object for a string constant (`&'static str`)."]]});
