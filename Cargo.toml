@@ -1,21 +1,5 @@
-[package]
-name = "image2aa"
-version = "0.1.4"
-authors = ["Yusuke Sangenya (genya0407) <longinus.eva@gmail.com>"]
-repository = "https://github.com/genya0407/image2aa"
-keywords = ["image", "png", "jpeg", "jpg"]
-license-file = "LICENSE"
-readme = "README.md"
-description = "Convert image to ASCII Art."
-documentation = "https://genya0407.github.io/image2aa/target/doc/image2aa/index.html"
+[workspace]
 
-[[bin]]
-name = "image2aa"
-path = "src/cli.rs"
-
-[dependencies]
-ndarray = { version = "0.10.0" }
-image = "0.23.6"
-string-error = "0.1.0"
-getopts = "0.2"
-base64 = "~0.6.0"
+members = [
+  "core", "web"
+]
