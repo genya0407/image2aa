@@ -7,5 +7,6 @@ services:
       - "127.0.0.1:${PORT:?err}:8000"
     restart: always
     environment:
-      - ROCKET_ENV = prod
+      - ROCKET_ENV=prod
+      - ROCKET_ADDRESS=0.0.0.0
 
