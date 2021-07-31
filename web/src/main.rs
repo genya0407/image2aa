@@ -130,8 +130,6 @@ async fn image_with_option<'r>(options: Options, image_binary: rocket::Data<'r>)
 
 #[launch]
 fn rocket() -> rocket::Rocket<rocket::Build> {
-    dotenv::dotenv().ok();
-
     rocket::build().mount(
         "/",
         routes![

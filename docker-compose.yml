@@ -1,0 +1,11 @@
+version: '3'
+services:
+  web:
+    image: docker.genya0407.net/image2aa_web:${TAG}
+    command: /usr/bin/image2aa_web
+    ports:
+      - "127.0.0.1:${PORT:?err}:8000"
+    restart: always
+    environment:
+      - ROCKET_ENV = prod
+
