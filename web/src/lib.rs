@@ -1,7 +1,3 @@
-extern crate image;
-extern crate imageproc;
-extern crate rusttype;
-
 use image::{Rgb, RgbImage};
 use imageproc::drawing::draw_text_mut;
 use rusttype::Font;

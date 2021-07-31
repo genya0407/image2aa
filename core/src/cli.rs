@@ -1,8 +1,5 @@
-extern crate getopts;
-extern crate image2aa;
-
 use getopts::Options;
-use image2aa::{filter, utils};
+use image2aa_core::{filter, utils};
 use std::env;
 use std::fs::File;
 

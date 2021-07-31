@@ -231,7 +231,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d5f1c7727e460397e56abc4bddc1d49e07a1ad78fc98eb2e1c8f032a58a2f80d"
 dependencies = [
  "percent-encoding",
- "time 0.2.27",
+ "time",
  "version_check",
 ]
 
@@ -719,7 +719,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "image2aa"
+name = "image2aa_core"
 version = "0.1.4"
 dependencies = [
  "base64",
@@ -735,7 +735,7 @@ version = "0.1.3"
 dependencies = [
  "dotenv",
  "image",
- "image2aa",
+ "image2aa_core",
  "imageproc",
  "rand 0.4.6",
  "rocket",
@@ -743,7 +743,7 @@ dependencies = [
  "rusttype",
  "serde",
  "sha3",
- "time 0.3.0",
+ "time",
 ]
 
 [[package]]
@@ -1525,7 +1525,7 @@ dependencies = [
  "serde_json",
  "state",
  "tempfile",
- "time 0.2.27",
+ "time",
  "tokio",
  "tokio-stream",
  "tokio-util",
@@ -1573,7 +1573,7 @@ dependencies = [
  "smallvec",
  "stable-pattern",
  "state",
- "time 0.2.27",
+ "time",
  "tokio",
  "uncased",
 ]
@@ -1937,15 +1937,6 @@ dependencies = [
  "time-macros",
  "version_check",
  "winapi",
-]
-
-[[package]]
-name = "time"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6cf2535c6456e772ad756a0854ec907ede55d73d0b5a34855d808cb2d2f0942e"
-dependencies = [
- "libc",
 ]
 
 [[package]]

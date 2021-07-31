@@ -9,7 +9,7 @@ name = "web"
 path = "src/main.rs"
 
 [dependencies]
-image2aa = { path = '../image2aa' }
+image2aa_core = { path = '../core' }
 rocket = { version = "0.5.0-rc.1", features = ["json"] }
 rocket_codegen = "0.5.0-rc.1"
 image = "0.23.6"

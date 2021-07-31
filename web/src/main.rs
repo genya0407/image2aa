@@ -1,16 +1,10 @@
-extern crate dotenv;
 #[macro_use]
 extern crate rocket;
-extern crate image;
-extern crate image2aa;
-extern crate image2aa_web;
-extern crate rand;
-extern crate sha3;
-extern crate time;
 
-use image2aa::{filter, utils};
+use image2aa_core::{filter, utils};
 use rand::Rng;
 use rocket::form::Form;
+use rocket::form::FromForm;
 use rocket::fs::NamedFile;
 use rocket::http::Status;
 use rocket::response::Responder;
