@@ -3,18 +3,33 @@
 extern crate getopts;
 extern crate image2aa;
 
-use std::fs::File;
-use std::env;
 use getopts::Options;
 use image2aa::{filter, utils};
+use std::env;
+use std::fs::File;
 
 fn setup_option_parser() -> Options {
     let mut opts = Options::new();
     opts.optopt("s", "blocksize", "set bocksize (default: 32)", "SIZE");
     opts.optopt("i", "input", "input file path", "FILE");
-    opts.optopt("", "char-detect-thresh", "threshould for character detection (default: 10)", "THRESH");
-    opts.optopt("", "line-detect-thresh", "threshould for line detection (default: 10)", "THRESH");
-    opts.optopt("", "shrink-thresh", "threshould for shrink (default: 5)", "THRESH");
+    opts.optopt(
+        "",
+        "char-detect-thresh",
+        "threshould for character detection (default: 10)",
+        "THRESH",
+    );
+    opts.optopt(
+        "",
+        "line-detect-thresh",
+        "threshould for line detection (default: 10)",
+        "THRESH",
+    );
+    opts.optopt(
+        "",
+        "shrink-thresh",
+        "threshould for shrink (default: 5)",
+        "THRESH",
+    );
     opts.optflag("", "help", "");
     return opts;
 }
@@ -24,7 +39,7 @@ fn main() {
     let parser = setup_option_parser();
     let matches = match parser.parse(&args[1..]) {
         Ok(m) => m,
-        Err(f) => panic!(f.to_string())
+        Err(f) => panic!(f.to_string()),
     };
 
     if !matches.opt_present("i") || matches.opt_present("help") {
@@ -54,9 +69,7 @@ fn main() {
 
     let image_array = utils::read_image(File::open(input_file).unwrap()).unwrap();
     let grayscale_array = filter::grayscale::default().run(image_array);
-    let gradient_array = filter::line::default().run(grayscale_array.clone());
-    let line_array = shrink_filter.run(binary_filter.run(gradient_array)).mapv(|e| e as f32) * 250.;
-    let hough_array = hough_filter.run(line_array);
+    let hough_array = hough_filter.run(grayscale_array);
     let aa = filter::ascii_art::default().run(hough_array);
     println!("{}", aa);
 }
