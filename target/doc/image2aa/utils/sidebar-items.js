@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["convolve2d",""],["read_image",""],["write_grayscale_png",""]]});
