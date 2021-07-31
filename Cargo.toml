@@ -15,7 +15,7 @@ path = "src/cli.rs"
 
 [dependencies]
 ndarray = { version = "0.10.0" }
-image = "0.18.0"
+image = "0.22.0"
 string-error = "0.1.0"
 getopts = "0.2"
 base64 = "~0.6.0"
