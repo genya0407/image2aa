@@ -37,7 +37,7 @@ fn main() {
     let parser = setup_option_parser();
     let matches = match parser.parse(&args[1..]) {
         Ok(m) => m,
-        Err(f) => panic!(f.to_string()),
+        Err(f) => std::panic::panic_any(f.to_string()),
     };
 
     if !matches.opt_present("i") || matches.opt_present("help") {

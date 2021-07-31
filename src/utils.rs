@@ -18,7 +18,7 @@ pub fn convolve2d(base_arr: &Array2<f32>, filter: &Array2<f32>) -> Array2<f32> {
     return result;
 }
 
-pub fn read_image<R: Read>(mut image_file: R) -> Result<Array3<f32>, Box<Error>> {
+pub fn read_image<R: Read>(mut image_file: R) -> Result<Array3<f32>, Box<dyn Error>> {
     let mut image_buffer = Vec::new();
     image_file.read_to_end(&mut image_buffer)?;
     let format = image::guess_format(&image_buffer)?;
@@ -30,7 +30,7 @@ pub fn read_image<R: Read>(mut image_file: R) -> Result<Array3<f32>, Box<Error>>
     }
 }
 
-fn read_to_array<D: ImageDecoder>(mut decoder: D) -> Result<Array3<f32>, Box<Error>> {
+fn read_to_array<D: ImageDecoder>(mut decoder: D) -> Result<Array3<f32>, Box<dyn Error>> {
     let result = decoder.read_image()?;
     let (x, y) = decoder.dimensions()?;
     let colortype = decoder.colortype()?;
@@ -50,7 +50,7 @@ fn read_to_array<D: ImageDecoder>(mut decoder: D) -> Result<Array3<f32>, Box<Err
     }
 }
 
-pub fn write_grayscale_png(image_file: Box<Write>, img: &Array2<f32>) -> Result<(), Box<Error>> {
+pub fn write_grayscale_png(image_file: Box<dyn Write>, img: &Array2<f32>) -> Result<(), Box<dyn Error>> {
     let decoder = image::png::PNGEncoder::new(image_file);
     let shape = img.shape();
     let height = shape[0] as u32;
