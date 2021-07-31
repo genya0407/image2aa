@@ -1,5 +1,3 @@
-#![feature(slice_patterns)]
-
 extern crate getopts;
 extern crate image2aa;
 
