@@ -25,8 +25,8 @@ pub fn read_image<R: Read>(mut image_file: R) -> Result<Array3<f32>, Box<dyn Err
     let format = image::guess_format(&image_buffer)?;
     let image_reader = Cursor::new(image_buffer);
     match format {
-        image::ImageFormat::PNG => read_to_array(image::png::PNGDecoder::new(image_reader)?),
-        image::ImageFormat::JPEG => read_to_array(image::jpeg::JPEGDecoder::new(image_reader)?),
+        image::ImageFormat::Png => read_to_array(image::png::PngDecoder::new(image_reader)?),
+        image::ImageFormat::Jpeg => read_to_array(image::jpeg::JpegDecoder::new(image_reader)?),
         _ => Err(static_err(
             "Unsupported file type. Only PNG and JPEG are supported.",
         )),
@@ -35,19 +35,23 @@ pub fn read_image<R: Read>(mut image_file: R) -> Result<Array3<f32>, Box<dyn Err
 
 fn read_to_array<'a, D: ImageDecoder<'a>>(decoder: D) -> Result<Array3<f32>, Box<dyn Error>> {
     let (x, y) = decoder.dimensions();
-    let colortype = decoder.colortype();
-    let raw_data = decoder
-        .read_image()?
-        .into_iter()
-        .map(|e| e as f32)
-        .collect::<Vec<f32>>();
+    let colortype = decoder.color_type();
+    let mut buf = vec![];
+    decoder.into_reader()?.read_to_end(&mut buf)?;
+    let raw_data = buf.into_iter().map(|e| e as f32).collect::<Vec<f32>>();
     let arr = Array1::<f32>::from(raw_data);
 
     match colortype {
-        ColorType::RGBA(_) => arr
+        ColorType::Rgba8 => arr
             .into_shape((y as Ix, x as Ix, 4 as Ix))
             .map_err(|_| static_err("Wrong shape!")),
-        ColorType::RGB(_) => arr
+        ColorType::Rgba16 => arr
+            .into_shape((y as Ix, x as Ix, 4 as Ix))
+            .map_err(|_| static_err("Wrong shape!")),
+        ColorType::Rgb8 => arr
+            .into_shape((y as Ix, x as Ix, 3 as Ix))
+            .map_err(|_| static_err("Wrong shape!")),
+        ColorType::Rgb16 => arr
             .into_shape((y as Ix, x as Ix, 3 as Ix))
             .map_err(|_| static_err("Wrong shape!")),
         _ => Err(static_err("Unsupported colortype")),
@@ -58,13 +62,13 @@ pub fn write_grayscale_png(
     image_file: Box<dyn Write>,
     img: &Array2<f32>,
 ) -> Result<(), Box<dyn Error>> {
-    let decoder = image::png::PNGEncoder::new(image_file);
+    let decoder = image::png::PngEncoder::new(image_file);
     let shape = img.shape();
     let height = shape[0] as u32;
     let width = shape[1] as u32;
     let u8img = img.clone().map(|e| *e as u8);
     let data = u8img.as_slice().unwrap();
     decoder
-        .encode(data, width, height, ColorType::Gray(8))
+        .encode(data, width, height, ColorType::L8)
         .map_err(|_| static_err("Error writing image!"))
 }
