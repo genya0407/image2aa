@@ -1,12 +1,12 @@
-# image2aa
+# image2aa_core
 
-Convert image file to ascii art.
+Core logics and CLI.
 
 ## Install
 
 ```shell-session
-$ cd image2aa/
-$ cargo install
+$ cd core
+$ cargo install --path .
 ```
 
 ## Run
