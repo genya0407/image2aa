@@ -31,13 +31,6 @@ impl<'r, 'o: 'r> Responder<'r, 'o> for ContentDisposition {
 }
 
 #[derive(FromForm)]
-struct Options {
-    blocksize: Option<usize>,
-    char_detect_thresh: Option<u32>,
-    line_detect_thresh: Option<u32>,
-}
-
-#[derive(FromForm)]
 struct AsciiArtForm {
     text: String,
 }
@@ -76,23 +69,21 @@ async fn download_aa_image(ascii_art: Form<AsciiArtForm>) -> Option<ContentDispo
         .ok()
 }
 
-#[post("/image", data = "<image_binary>")]
-async fn image_without_options<'r>(image_binary: rocket::Data<'r>) -> Json<AsciiArt> {
-    let options = Options {
-        blocksize: None,
-        char_detect_thresh: None,
-        line_detect_thresh: None,
-    };
-    image_with_option(options, image_binary).await
-}
-
 #[derive(Serialize)]
 struct AsciiArt {
     aa: String,
 }
 
-#[post("/image?<options>", data = "<image_binary>")]
-async fn image_with_option<'r>(options: Options, image_binary: rocket::Data<'r>) -> Json<AsciiArt> {
+#[post(
+    "/image?<blocksize>&<char_detect_thresh>&<line_detect_thresh>",
+    data = "<image_binary>"
+)]
+async fn image_with_option<'r>(
+    blocksize: usize,
+    char_detect_thresh: u32,
+    line_detect_thresh: u32,
+    image_binary: rocket::Data<'r>,
+) -> Json<AsciiArt> {
     use crate::rocket::tokio::io::AsyncReadExt;
     use rocket::data::ByteUnit;
 
@@ -104,17 +95,10 @@ async fn image_with_option<'r>(options: Options, image_binary: rocket::Data<'r>)
         .unwrap();
 
     let mut hough_filter = filter::hough::default();
-    if let Some(block_size) = options.blocksize {
-        hough_filter.block_size = block_size;
-    }
-    if let Some(slope_count_thresh) = options.char_detect_thresh {
-        hough_filter.slope_count_thresh = slope_count_thresh;
-    }
-
+    hough_filter.block_size = blocksize;
+    hough_filter.slope_count_thresh = char_detect_thresh;
     let mut binary_filter = filter::binary::default();
-    if let Some(thresh) = options.line_detect_thresh {
-        binary_filter.thresh = thresh;
-    }
+    binary_filter.thresh = line_detect_thresh;
 
     let image_array = utils::read_image(image_buf.as_slice())
         .map_err(|e| println!("{}", e))
@@ -130,13 +114,5 @@ async fn image_with_option<'r>(options: Options, image_binary: rocket::Data<'r>)
 
 #[launch]
 fn rocket() -> rocket::Rocket<rocket::Build> {
-    rocket::build().mount(
-        "/",
-        routes![
-            index,
-            image_with_option,
-            image_without_options,
-            download_aa_image
-        ],
-    )
+    rocket::build().mount("/", routes![index, image_with_option, download_aa_image])
 }
