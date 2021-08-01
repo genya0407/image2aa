@@ -3,7 +3,7 @@
         "web": "Dockerfile"
     },
     "context": "genya0407.net",
-    "tag": "v0.1.4",
+    "tag": "v0.1.5",
     "projectName": "image2aa",
     "registry": "docker.genya0407.net",
     "environments": {},
