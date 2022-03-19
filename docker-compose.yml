@@ -1,12 +1,17 @@
 version: '3'
 services:
-  web:
-    image: docker.genya0407.net/image2aa_web:${TAG}
+  image2aa_web:
+    image: ${REGISTRY:?err}/image2aa_image2aa_web:${TAG}
     command: /usr/bin/image2aa_web
-    ports:
-      - "127.0.0.1:${PORT:?err}:8000"
     restart: always
     environment:
       - ROCKET_ENV=prod
       - ROCKET_ADDRESS=0.0.0.0
+      - ROCKET_PORT=80
+    networks:
+      - default
+      - applications
 
+networks:
+  applications:
+    external: true
